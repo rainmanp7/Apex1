@@ -16,20 +16,21 @@ level and the packet loss probability.
 float congestion_level_estimate, packet_loss_probability_estimate;
 reinforcement_learning_model(cwnd, &congestion_level_estimate,
 &packet_loss_probability_estimate);
- /* 
- Calculate the new congestion window size using the learning reinforcement
- */
+/*
+Calculate the new congestion window size using the learning reinforcement
+*/
 int new_cwnd = 0;
 if (congestion_level_estimate < 0.5) {
 new_cwnd = min(2 * cwnd, max_cwnd);
 } else if (congestion_level_estimate > 0.5) {
 new_cwnd = max(cwnd / 2, 1);
 } else {
-	// The reinforcement learning model is not confident in its estimate, so
+// The reinforcement learning model is not confident in its
+estimate, so
 // use the vanilla algorithm.
 new_cwnd = vanilla_rtt_estimation(cwnd);
 }
- return new_cwnd;
+return new_cwnd;
 }
 void print_new_cwnd_to_memory(int new_cwnd) {
 char *buffer = malloc(sizeof(int));
@@ -65,7 +66,7 @@ double *output = malloc(sizeof(double));
 int throughput = 1;
 int lost_packets = 0;
 while (lost_packets <= 1) {
-new_cwnd = calculate_new_cwnd(cwnd, congestion_level_estimate,
+int new_cwnd = calculate_new_cwnd(cwnd, congestion_level_estimate,
 packet_loss_probability_estimate, max_cwnd);
 throughput = throughput * new_cwnd;
 if (throughput > 1) {
@@ -81,5 +82,13 @@ if (throughput < 1) {
 lost_packets--;
 }
 }
+// Import the reinforcement learning model.
+import reinforcement_learning_model
+// Calculate the congestion level and packet loss probability estimates.
+congestion_level_estimate, packet_loss_probability_estimate =
+reinforcement_learning_model(cwnd)
+// Calculate the new congestion window size.
+new_cwnd = calculate_new_cwnd(cwnd, congestion_level_estimate,
+packet_loss_probability_estimate, max_cwnd)
 return 0;
 }
