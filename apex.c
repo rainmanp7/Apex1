@@ -1,93 +1,84 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/mman.h>
 #include <math.h>
-import reinforcement_learning_model
-struct packet {
-int id;
-bool lost;
-int arrival_time;
-int send_time;
+#include <time.h>
+struct MachineLearningModule {
+NeuralNetwork *model;
+void initialize(char *file) {
+model = load_neural_network(file);
+}
+void train() {
+train_neural_network(model);
+}
+void run() {
+model->run();
+}
+float predict() {
+return model->predict();
+}
 };
-int calculate_new_cwnd(int cwnd, float congestion_level_estimate, float
-packet_loss_probability_estimate, int max_cwnd) {
-/*
-* Use a reinforcement learning model to estimate the congestion
-level and the packet loss probability.
-*/
-float congestion_level_estimate, packet_loss_probability_estimate;
-reinforcement_learning_model(cwnd, &congestion_level_estimate,
-&packet_loss_probability_estimate);
-/*
-Calculate the new congestion window size using the learning reinforcement
-*/
-int new_cwnd = 0;
-if (congestion_level_estimate < 0.5) {
-new_cwnd = min(2 * cwnd, max_cwnd);
-} else if (congestion_level_estimate > 0.5) {
-new_cwnd = max(cwnd / 2, 1);
-} else {
-// The reinforcement learning model is not confident in its
-estimate, so
-// use the vanilla algorithm.
-new_cwnd = vanilla_rtt_estimation(cwnd);
-}
-return new_cwnd;
-}
-void print_new_cwnd_to_memory(int new_cwnd) {
-char *buffer = malloc(sizeof(int));
-*buffer = new_cwnd;
-}
-double adaptive_rtt_estimation(double rtt_estimate) {
-if (rtt_estimate < 100) {
-return rtt_estimate * 2;
-} else {
-return rtt_estimate / 2;
-}
-}
-double efficient_rtt_estimation(double rtt_estimate) {
-if (rtt_estimate < 100) {
-return (int)rtt_estimate;
-} else {
-return round(rtt_estimate);
-}
-}
+struct Connection {
+int congestion_window_size;
+MachineLearningModule *congestion_status_module;
+MachineLearningModule *ttl_module;
+MachineLearningModule *current_congestion_window_status_module;
+};
 int main() {
-struct packet packets[] = {
-{1, false, 1000, 1100},
-{2, true, 2000, 2100},
-{3, false, 3000, 3100},
-};
-int n = sizeof(packets) / sizeof(packets[0]);
-double rtt_estimate = vanilla_rtt_estimation(packets, n);
-double *output = malloc(sizeof(double));
-*output = rtt_estimate;
-/*
-* Add the newly generated code here.
-*/
-int throughput = 1;
-int lost_packets = 0;
-while (lost_packets <= 1) {
-int new_cwnd = calculate_new_cwnd(cwnd, congestion_level_estimate,
-packet_loss_probability_estimate, max_cwnd);
-throughput = throughput * new_cwnd;
-if (throughput > 1) {
-lost_packets++;
+// Create the 3 virtual memory files.
+char *congestion_status_file;
+char *ttl_file;
+char *current_congestion_window_status_file;
+congestion_status_file = mmap(NULL, 476160, PROT_READ | PROT_WRITE,
+MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+ttl_file = mmap(NULL, 476160, PROT_READ | PROT_WRITE, MAP_PRIVATE |
+MAP_ANONYMOUS, -1, 0);
+current_congestion_window_status_file = mmap(NULL, 476160, PROT_READ |
+PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+if (congestion_status_file == MAP_FAILED || ttl_file == MAP_FAILED ||
+current_congestion_window_status_file == MAP_FAILED) {
+printf("Failed to map files\n");
+return 1;
+}
+// Create the 3 machine learning modules.
+MachineLearningModule *congestion_status_module;
+MachineLearningModule *ttl_module;
+MachineLearningModule *current_congestion_window_status_module;
+congestion_status_module = malloc(sizeof(MachineLearningModule));
+ttl_module = malloc(sizeof(MachineLearningModule));
+current_congestion_window_status_module =
+malloc(sizeof(MachineLearningModule));
+// Initialize the 3 machine learning modules.
+congestion_status_module->initialize(congestion_status_file);
+ttl_module->initialize(ttl_file);
+current_congestion_window_status_module->initialize(current_congestion_win
+dow_status_file);
+// Load the machine learning models from files.
+congestion_status_module->load_model("congestion_status_model.pkl");
+ttl_module->load_model("ttl_model.pkl");
+current_congestion_window_status_module->load_model("current_congestion_wi
+ndow_status_model.pkl");
+// Create a connection.
+struct Connection connection;
+connection.congestion_window_size = 10;
+connection.congestion_status_module = congestion_status_module;
+connection.ttl_module = ttl_module;
+connection.current_congestion_window_status_module =
+current_congestion_window_status_module;
+// Get the predictions from the 3 machine learning modules.
+float congestion_status_prediction =
+connection.congestion_status_module->predict();
+float ttl_prediction = connection.ttl_module->predict();
+float current_congestion_window_status_prediction =
+connection.current_congestion_window_status_module->predict();
+// Adjust the congestion window size based on the predictions.
+if (congestion_status_prediction < 0.5) {
+// The network is congested.
+connection.congestion_window_size = connection.congestion_window_size / 2;
 } else {
-new_cwnd = cwnd / 2;
+// The network is not congested.
+connection.congestion_window_size = connection.congestion_window_size * 2;
 }
-}
-while (lost_packets > 0) {
-new_cwnd = cwnd / 2;
-throughput = throughput * new_cwnd;
-if (throughput < 1) {
-lost_packets--;
-}
-}
-// Import the reinforcement learning model.
-congestion_level_estimate, packet_loss_probability_estimate =
-reinforcement_learning_model(cwnd)
-// Calculate the new congestion window size.
-new_cwnd = calculate_new_cwnd(cwnd, congestion_level_estimate,
-packet_loss_probability_estimate, max_cwnd)
-return 0;
-}
+// Close the 3 virtual memory files.
+munmap(congestion_status_file, 476160);
+munmap(ttl_file, 476160);
