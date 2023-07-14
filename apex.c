@@ -16,18 +16,20 @@ level and the packet loss probability.
 float congestion_level_estimate, packet_loss_probability_estimate;
 reinforcement_learning_model(cwnd, &congestion_level_estimate,
 &packet_loss_probability_estimate);
-/*
-* Calculate the new congestion window size.
-*/
+ /* 
+ Calculate the new congestion window size using the learning reinforcement
+ */
 int new_cwnd = 0;
 if (congestion_level_estimate < 0.5) {
 new_cwnd = min(2 * cwnd, max_cwnd);
 } else if (congestion_level_estimate > 0.5) {
 new_cwnd = max(cwnd / 2, 1);
 } else {
-new_cwnd = cwnd;
+	// The reinforcement learning model is not confident in its estimate, so
+// use the vanilla algorithm.
+new_cwnd = vanilla_rtt_estimation(cwnd);
 }
-return new_cwnd;
+ return new_cwnd;
 }
 void print_new_cwnd_to_memory(int new_cwnd) {
 char *buffer = malloc(sizeof(int));
