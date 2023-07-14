@@ -7,8 +7,8 @@ bool lost;
 int arrival_time;
 int send_time;
 };
-int calculate_new_cwnd(int cwnd, float cong  estion_level, float
-packet_loss_probability, int max_cwnd) {
+int calculate_new_cwnd(int cwnd, float congestion_level_estimate, float
+packet_loss_probability_estimate, int max_cwnd) {
 /*
 * Use a reinforcement learning model to estimate the congestion
 level and the packet loss probability.
