@@ -22,11 +22,9 @@ reinforcement_learning_model(cwnd, &congestion_level_estimate,
 int new_cwnd = 0;
 if (congestion_level_estimate < 0.5) {
 new_cwnd = min(2 * cwnd, max_cwnd);
-}
-else if (congestion_level_estimate > 0.5) {
+} else if (congestion_level_estimate > 0.5) {
 new_cwnd = max(cwnd / 2, 1);
-}
-else {
+} else {
 new_cwnd = cwnd;
 }
 return new_cwnd;
