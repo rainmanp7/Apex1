@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+import reinforcement_learning_model
 struct packet {
 int id;
 bool lost;
@@ -83,8 +84,6 @@ lost_packets--;
 }
 }
 // Import the reinforcement learning model.
-import reinforcement_learning_model
-// Calculate the congestion level and packet loss probability estimates.
 congestion_level_estimate, packet_loss_probability_estimate =
 reinforcement_learning_model(cwnd)
 // Calculate the new congestion window size.
