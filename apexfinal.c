@@ -1,23 +1,19 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdio.h> 
+#include <stdlib.h> 
 #include <math.h>
-unsigned long congestion_control(unsigned long value,
-size_t packet_size) {
-unsigned long congestion_window_size = value * 2;
+double congestion_control(unsigned long value, size_t packet_size) {
+double congestion_window_size = value * 2;
 if (congestion_window_size > MAX_CONGESTION_WINDOW) {
 congestion_window_size = MAX_CONGESTION_WINDOW;
 }
 // Handle multiple connections.
-List<Connection> connections;
+struct Connection connections[10];
 for (int i = 0; i < 10; i++) {
-Connection connection;
-connection.congestion_window = 1;
-connections.add(connection);
+connections[i].congestion_window = 1;
 }
 // Handle varying packet sizes.
-unsigned long new_congestion_window =
-reinforcement_learning_model.predict(congestion_window_size,
-packet_size);
+double new_congestion_window = reinforcement_learning_model.predict(
+congestion_window_size, packet_size);
 // Handle different types of congestion.
 enum CongestionType {
 NORMAL,
@@ -36,16 +32,12 @@ if (congestion_type == NORMAL) {
 // Use a more sophisticated congestion control algorithm.
 double round_trip_time = get_round_trip_time();
 double bandwidth = get_bandwidth();
-new_congestion_window = new_congestion_window * (1 + round_trip_time /
-100 +
-bandwidth / 100000);
-// Only acknowledge packets that have not been lost.
-if not random.random() < get_loss_rate()):
-new_congestion_window += 1
+new_congestion_window = new_congestion_window * (
+1 + round_trip_time / 100 + bandwidth / 100000);
 } else if (congestion_type == CONGESTION_AVOIDANCE) {
 // Consider other factors that affect congestion.
-new_congestion_window = new_congestion_window / 2 +
-(get_number_of_connections() / 100);
+new_congestion_window = new_congestion_window / 2 + (
+get_number_of_connections() / 100);
 } else if (congestion_type == DISTURBED) {
 // Handle disturbed connections.
 // Instead of dividing the congestion window size by 4,
@@ -56,19 +48,19 @@ new_congestion_window = new_congestion_window * (1 -
 disturbance_severity);
 }
 // Update the congestion window size for each connection.
-for (Connection connection : connections) {
-connection.congestion_window = new_congestion_window;
+for (int i = 0; i < 10; i++) {
+connections[i].congestion_window = new_congestion_window;
 }
 return new_congestion_window;
 }
 // Calculate the round-trip time.
-unsigned long get_round_trip_time() {
+double get_round_trip_time() {
 // Get the round-trip time from the network.
 double round_trip_time = 100;
 return round_trip_time;
 }
 // Calculate the bandwidth of the network.
-unsigned long get_bandwidth() {
+double get_bandwidth() {
 // Get the bandwidth from the network.
 double bandwidth = 100000;
 return bandwidth;
