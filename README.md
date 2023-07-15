@@ -2,6 +2,9 @@
 Apex Network and Congestion Control
 by using reinforcement machine learning.
 
+apexfinal.c = is my final work for now of creating a serious contribution
+regarding congestion control.
+
 This is a Network reinforced machine learning.
 in one file called apex22
 and A congestion control named apex.c
