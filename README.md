@@ -1,5 +1,7 @@
 # Apex1
-Apex Congestion Control
+Apex Network and Congestion Control
+by using reinforcement machine learning.
+
 This is a Network reinforced machine learning.
 in one file called apex22
 and A congestion control named apex.c
@@ -20,4 +22,5 @@ if you would like to contribute or help make this
 possible,bu all means "Fork It"
 don't forget to include my name in it.
 
+By rainmanp7 aka Christopher W. Brown.
 
